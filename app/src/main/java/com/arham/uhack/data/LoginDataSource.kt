@@ -15,8 +15,12 @@ class LoginDataSource {
     private var loggedInUser: LoggedInUser? = null
     suspend fun login(username: String, password: String): Result<LoggedInUser> {
         try {
-            auth.signInWithEmailAndPassword(username, password)
-                .await()
+
+            if (auth.currentUser == null)
+            {
+                auth.createUserWithEmailAndPassword(username, password)
+                    .await()
+            }
             val user = auth.currentUser
             if (user != null) {
                 loggedInUser = LoggedInUser(user.uid, user.email!!)
