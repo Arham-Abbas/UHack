@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.arham.uhack.ui.navigation.NavigationActivity
 import com.arham.uhack.ui.theme.UHackTheme
 
 import com.arham.uhack.ui.login.LoginActivity
@@ -52,6 +53,8 @@ class MainActivity : ComponentActivity() {
             loginViewModel = LoginViewModelFactory().create(LoginViewModel::class.java)
             loginViewModel.login(user.email!!, user.uid)
         }
+        val intent = Intent(this, NavigationActivity::class.java)
+        startActivity(intent)
     }
 }
 
