@@ -10,4 +10,5 @@
     <string name="invalid_password">Not a valid password</string>
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="web_client_id">758276425326-i3pe52r682knkhc6j8gmovtc01s7ohmg.apps.googleusercontent.com</string>
 </resources>

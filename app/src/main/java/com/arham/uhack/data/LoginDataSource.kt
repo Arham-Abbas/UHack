@@ -18,7 +18,7 @@ class LoginDataSource {
 
             if (auth.currentUser == null)
             {
-                auth.createUserWithEmailAndPassword(username, password)
+                auth.signInWithEmailAndPassword(username, password)
                     .await()
             }
             val user = auth.currentUser
