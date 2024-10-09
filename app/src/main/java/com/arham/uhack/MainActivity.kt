@@ -1,6 +1,8 @@
 package com.arham.uhack
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,6 +10,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,13 +22,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arham.uhack.ui.theme.UHackTheme
-import com.arham.uhack.ui.login.LoginViewModel
-import com.arham.uhack.ui.login.LoginViewModelFactory
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.arham.uhack.data.Result
 
 class MainActivity : ComponentActivity() {
-    private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +43,9 @@ class MainActivity : ComponentActivity() {
             }
 
         } else {
-            loginViewModel = LoginViewModelFactory().create(LoginViewModel::class.java)
-            loginViewModel.login(user.email!!, user.uid)
+            val intent = Intent(this, NavigationActivity::class.java)
+            this.startActivity(intent)
+            finish()
         }
     }
 }
@@ -48,6 +54,8 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val context = LocalContext.current
     val login = Login(context)
+    var isSignInButtonClicked by remember { mutableStateOf(false) }
+    val activity = (LocalContext.current as ComponentActivity)
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -79,7 +87,7 @@ fun MainScreen() {
 
         Spacer(modifier = Modifier.weight(1f)) // Pushes button downwards
 
-        Button(onClick = { login.signInWithGoogle() }) {
+        Button(onClick = { isSignInButtonClicked = true }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(R.drawable.google), // Replace with your icon
@@ -92,6 +100,25 @@ fun MainScreen() {
         }
 
         Spacer(modifier = Modifier.height(32.dp)) // Fixed height spacer
+
+        LaunchedEffect(key1 = isSignInButtonClicked) {
+            if (isSignInButtonClicked) {
+                isSignInButtonClicked = false
+
+                when (val result = login.signInWithGoogle()) {
+                    is Result.Success -> {
+                        // Sign-in successful
+                        val intent = Intent(context, NavigationActivity::class.java)
+                        context.startActivity(intent)
+                        activity.finish()
+                    }
+                    is Result.Error -> {
+                        // Sign-in failed
+                        Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 }
 

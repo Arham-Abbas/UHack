@@ -1,4 +1,4 @@
-package com.arham.uhack.ui.navigation
+package com.arham.uhack
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,10 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.arham.uhack.ui.navigation.NavigationHost
 import com.arham.uhack.ui.theme.UHackTheme
 import kotlinx.coroutines.launch
 
@@ -31,7 +29,7 @@ class NavigationActivity : ComponentActivity() {
                     val window = (view.context as android.app.Activity).window
                     WindowCompat.setDecorFitsSystemWindows(window, false)
                 }
-                MyScreen()
+                NavigationScreen()
             }
         }
     }
@@ -39,7 +37,7 @@ class NavigationActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScreen() {
+fun NavigationScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
@@ -116,25 +114,10 @@ fun DrawerContent(onDestinationClicked: (route: String) -> Unit) {
     }
 }
 
-@Composable
-fun NavigationHost(
-    navController: NavHostController,
-    paddingValues: PaddingValues
-) {
-    NavHost(
-        navController = navController,
-        startDestination = "Home",
-        modifier = Modifier.padding(paddingValues)
-    ) {
-        composable("Home") { HomeScreen() }
-        composable("Marking") { MarkingScreen() }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun NavigationScreenPreview() {
     UHackTheme {
-        MyScreen()
+        NavigationScreen()
     }
 }

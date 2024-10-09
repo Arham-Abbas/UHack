@@ -7,6 +7,8 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import com.arham.uhack.data.Result
+import com.arham.uhack.data.model.LoggedInUser
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
@@ -17,70 +19,83 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class Login(private val context: Context) {
 
-    fun signInWithGoogle() {
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val credentialManager = CredentialManager.create(this.context)
-        val nonce = Nonce()
+    private val auth: FirebaseAuth = Firebase.auth
+    private var loggedInUser: LoggedInUser? = null
 
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(true)
-            .setServerClientId(this.context.getString(R.string.web_client_id))
-            .setAutoSelectEnabled(true)
-            .setNonce(nonce.generateNonce(16))
-            .build()
+    suspend fun signInWithGoogle(): Result<LoggedInUser> {
+        return suspendCoroutine { continuation ->
+            val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+            val credentialManager = CredentialManager.create(this.context)
+            val nonce = Nonce()
 
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(true)
+                .setServerClientId(this.context.getString(R.string.web_client_id))
+                .setAutoSelectEnabled(true)
+                .setNonce(nonce.generateNonce(16))
+                .build()
 
-        scope.launch {
-            try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = this@Login.context,
-                )
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-                handleSignIn(result)
-            } catch (e: GetCredentialException) {
-                // Handle sign-up
-                handleSignUp()
+            scope.launch {
+                try {
+                    val result = credentialManager.getCredential(
+                        request = request,
+                        context = this@Login.context,
+                    )
+                    val signInResult = handleSignIn(result) // Get the result from handleSignIn
+                    continuation.resume(signInResult) // Resume the continuation with the result
+                } catch (e: GetCredentialException) {
+                    // Handle sign-up
+                    val signUpResult = handleSignUp() // Get the result from handleSignUp
+                    continuation.resume(signUpResult) // Resume the continuation with the result
+                }
             }
         }
     }
 
-    private fun handleSignUp() {
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val credentialManager = CredentialManager.create(context)
+    private suspend fun handleSignUp(): Result<LoggedInUser> {
+        return suspendCoroutine { continuation ->
+            val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+            val credentialManager = CredentialManager.create(context)
 
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(context.getString(R.string.web_client_id))
-            .build()
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(context.getString(R.string.web_client_id))
+                .build()
 
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-        // Launch a new coroutine for sign-up
-        scope.launch {
-            try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = context,
-                )
+            // Launch a new coroutine for sign-up
+            scope.launch {
+                try {
+                    val result = credentialManager.getCredential(
+                        request = request,
+                        context = context,
+                    )
 
-                handleSignIn(result) // Handle sign-in after successful sign-up
-            } catch (e: GetCredentialException) {
-                // Handle sign-up errors
-                Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                    val signInResult = handleSignIn(result) // Get the result from handleSignIn
+                    continuation.resume(signInResult) // Resume the continuation with the result
+                } catch (e: GetCredentialException) {
+                    // Handle sign-up errors
+                    continuation.resume(Result.Error(IOException(context.getString(R.string.login_failed))))
+                }
             }
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
+    private suspend fun handleSignIn(result: GetCredentialResponse): Result<LoggedInUser> {
         // Handle the successfully returned credential.
         when (val credential = result.credential) {
             // GoogleIdToken credential
@@ -93,38 +108,32 @@ class Login(private val context: Context) {
                             .createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         firebaseAuthWithGoogle(idToken)
+                        Toast.makeText(context, context.getString(R.string.login_successful) + ": " + loggedInUser?.displayName, Toast.LENGTH_SHORT).show()
+                        return Result.Success(loggedInUser!!)
                     } catch (e: Exception) {
-                        Toast.makeText(context,
-                            context.getString(R.string.invalid_token) + ":" + e.toString(), Toast.LENGTH_SHORT).show()
+                        return Result.Error(IOException(context.getString(R.string.login_failed)))
                     }
-                } else {
-                    // Catch any unrecognized custom credential type here.
-                    Toast.makeText(context, context.getString(R.string.unexpected_token), Toast.LENGTH_SHORT).show()
                 }
+                // Catch any unrecognized custom credential type here.
+                return Result.Error(IOException(context.getString(R.string.unexpected_token)))
             }
             else -> {
                 // Catch any unrecognized credential type here.
-                Toast.makeText(context, context.getString(R.string.unexpected_token), Toast.LENGTH_SHORT).show()
+                return Result.Error(IOException(context.getString(R.string.unexpected_token)))
             }
         }
     }
 
-    private fun firebaseAuthWithGoogle(idToken: String) {
+    private suspend fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        val auth: FirebaseAuth = Firebase.auth
         auth.signInWithCredential(credential)
-            .addOnCompleteListener(MainActivity()) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    val user = auth.currentUser
-                    if (user != null) {
-                        Toast.makeText(context, context.getString(R.string.login_successful) + ":" + user.displayName, Toast.LENGTH_SHORT).show()
-                    }
-                    // Update UI
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(context, context.getString(R.string.login_failed) + ":" + task.exception, Toast.LENGTH_SHORT).show()
-                }
-            }
+            .await()
+        val user = auth.currentUser
+        if (user != null) {
+            loggedInUser = LoggedInUser(user.uid, user.displayName!!)
+        }
+        else {
+            throw IOException(context.getString(R.string.login_failed))
+        }
     }
 }

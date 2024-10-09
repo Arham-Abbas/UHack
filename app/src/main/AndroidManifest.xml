@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UHack">
         <activity
-            android:name=".ui.navigation.NavigationActivity"
+            android:name=".NavigationActivity"
             android:exported="false"
             android:label="@string/title_activity_navigation" />
         <activity
