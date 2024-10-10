@@ -3,16 +3,15 @@ package com.arham.uhack
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.arham.uhack.ui.navigation.NavigationHost
@@ -22,13 +21,10 @@ import kotlinx.coroutines.launch
 class NavigationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
         setContent {
             UHackTheme {
-                val view = LocalView.current
-                if (!view.isInEditMode) {
-                    val window = (view.context as android.app.Activity).window
-                    WindowCompat.setDecorFitsSystemWindows(window, false)
-                }
                 NavigationScreen()
             }
         }

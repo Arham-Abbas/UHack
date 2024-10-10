@@ -1,4 +1,4 @@
-package com.arham.uhack.data.model
+package com.arham.uhack.data
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

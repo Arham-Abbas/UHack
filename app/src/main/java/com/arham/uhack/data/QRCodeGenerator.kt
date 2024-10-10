@@ -1,4 +1,4 @@
-package com.arham.uhack.ui
+package com.arham.uhack.data
 
 import android.graphics.Bitmap
 import com.google.zxing.BarcodeFormat

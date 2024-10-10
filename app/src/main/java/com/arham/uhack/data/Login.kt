@@ -1,4 +1,4 @@
-package com.arham.uhack
+package com.arham.uhack.data
 
 import android.content.Context
 import android.widget.Toast
@@ -7,8 +7,7 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
-import com.arham.uhack.data.Result
-import com.arham.uhack.data.model.LoggedInUser
+import com.arham.uhack.R
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
@@ -28,6 +27,7 @@ class Login(private val context: Context) {
 
     private val auth: FirebaseAuth = Firebase.auth
     private var loggedInUser: LoggedInUser? = null
+    private val loginRepository: LoginRepository? = null
 
     suspend fun signInWithGoogle(): Result<LoggedInUser> {
         return suspendCoroutine { continuation ->
@@ -108,7 +108,6 @@ class Login(private val context: Context) {
                             .createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         firebaseAuthWithGoogle(idToken)
-                        Toast.makeText(context, context.getString(R.string.login_successful) + ": " + loggedInUser?.displayName, Toast.LENGTH_SHORT).show()
                         return Result.Success(loggedInUser!!)
                     } catch (e: Exception) {
                         return Result.Error(IOException(context.getString(R.string.login_failed)))
@@ -131,6 +130,8 @@ class Login(private val context: Context) {
         val user = auth.currentUser
         if (user != null) {
             loggedInUser = LoggedInUser(user.uid, user.displayName!!)
+            loginRepository?.setLoggedInUser(loggedInUser!!)
+            Toast.makeText(context, context.getString(R.string.login_successful) + ": " + loggedInUser?.displayName, Toast.LENGTH_SHORT).show()
         }
         else {
             throw IOException(context.getString(R.string.login_failed))

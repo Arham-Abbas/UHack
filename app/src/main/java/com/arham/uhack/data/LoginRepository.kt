@@ -1,18 +1,15 @@
 package com.arham.uhack.data
 
-import com.arham.uhack.data.model.LoggedInUser
-
 /**
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.
  */
 
-class LoginRepository(val dataSource: LoginDataSource) {
+class LoginRepository {
 
     // in-memory cache of the loggedInUser object
     private var user: LoggedInUser? = null
-    val isLoggedIn: Boolean
-        get() = user != null
+    private var isLoggedIn: Boolean = false
 
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
@@ -20,24 +17,25 @@ class LoginRepository(val dataSource: LoginDataSource) {
         user = null
     }
 
-    fun logout() {
-        user = null
-        dataSource.logout()
-    }
+    //fun logout() {
+        //user = null
+        //dataSource.logout()
+    //}
 
-    suspend fun login(username: String, password: String): Result<LoggedInUser> {
+    //suspend fun login(username: String, password: String): Result<LoggedInUser> {
         // handle login
-        val result = dataSource.login(username, password)
+        //val result = dataSource.login(username, password)
 
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
+        //if (result is Result.Success) {
+            //setLoggedInUser(result.data)
+        //}
 
-        return result
-    }
+        //return result
+    //}
 
-    private fun setLoggedInUser(loggedInUser: LoggedInUser) {
+    fun setLoggedInUser(loggedInUser: LoggedInUser) {
         this.user = loggedInUser
+        this.isLoggedIn = true
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
     }

@@ -1,4 +1,4 @@
-package com.arham.uhack
+package com.arham.uhack.data
 
 class Nonce {
     fun generateNonce(length: Int): String {
