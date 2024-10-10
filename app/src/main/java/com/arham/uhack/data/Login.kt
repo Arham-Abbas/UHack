@@ -114,7 +114,7 @@ class Login(private val context: Context) {
                     }
                 }
                 // Catch any unrecognized custom credential type here.
-                return Result.Error(IOException(context.getString(R.string.unexpected_token)))
+                return Result.Error(IOException(context.getString(R.string.invalid_token)))
             }
             else -> {
                 // Catch any unrecognized credential type here.
