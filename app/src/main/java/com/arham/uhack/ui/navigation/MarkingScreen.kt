@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.arham.uhack.data.FirestoreSyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 val Context.dataStore by preferencesDataStore(name = "settings")
 
 @Composable
-fun MarkingScreen() {
+fun MarkingScreen(firestoreSyncManager: FirestoreSyncManager) {
     val teams = listOf(
         Team(1, "Team A"),
         Team(2, "Team B"),

@@ -26,10 +26,8 @@ import kotlin.coroutines.suspendCoroutine
 class Login(private val context: Context) {
 
     private val auth: FirebaseAuth = Firebase.auth
-    private var loggedInUser: LoggedInUser? = null
-    private val loginRepository: LoginRepository? = null
 
-    suspend fun signInWithGoogle(): Result<LoggedInUser> {
+    suspend fun signInWithGoogle(): Result<Any> {
         return suspendCoroutine { continuation ->
             val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
             val credentialManager = CredentialManager.create(this.context)
@@ -63,7 +61,7 @@ class Login(private val context: Context) {
         }
     }
 
-    private suspend fun handleSignUp(): Result<LoggedInUser> {
+    private suspend fun handleSignUp(): Result<Any> {
         return suspendCoroutine { continuation ->
             val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
             val credentialManager = CredentialManager.create(context)
@@ -95,7 +93,7 @@ class Login(private val context: Context) {
         }
     }
 
-    private suspend fun handleSignIn(result: GetCredentialResponse): Result<LoggedInUser> {
+    private suspend fun handleSignIn(result: GetCredentialResponse): Result<Any> {
         // Handle the successfully returned credential.
         when (val credential = result.credential) {
             // GoogleIdToken credential
@@ -108,7 +106,7 @@ class Login(private val context: Context) {
                             .createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         firebaseAuthWithGoogle(idToken)
-                        return Result.Success(loggedInUser!!)
+                        return Result.Success(auth.currentUser)
                     } catch (e: Exception) {
                         return Result.Error(IOException(context.getString(R.string.login_failed)))
                     }
@@ -129,9 +127,7 @@ class Login(private val context: Context) {
             .await()
         val user = auth.currentUser
         if (user != null) {
-            loggedInUser = LoggedInUser(user.uid, user.displayName!!)
-            loginRepository?.setLoggedInUser(loggedInUser!!)
-            Toast.makeText(context, context.getString(R.string.login_successful) + ": " + loggedInUser?.displayName, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.login_successful) + ": " + user.displayName, Toast.LENGTH_SHORT).show()
         }
         else {
             throw IOException(context.getString(R.string.login_failed))
