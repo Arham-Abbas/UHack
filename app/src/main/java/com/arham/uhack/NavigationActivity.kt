@@ -5,16 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.arham.uhack.data.FirestoreSyncManager
 import com.arham.uhack.ui.navigation.NavigationHost
 import com.arham.uhack.ui.theme.UHackTheme
@@ -42,7 +47,7 @@ fun NavigationScreen() {
     val navController = rememberNavController()
     val context = LocalContext.current
     val firestoreSyncManager = FirestoreSyncManager(context)
-    var currentView by remember { mutableStateOf("Home") }
+    var currentView by remember { mutableStateOf(context.getString(R.string.route_home)) }
     var currentStack by remember { mutableStateOf<String?>(null) }
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -78,7 +83,25 @@ fun NavigationScreen() {
                             IconButton(onClick = {
                                 scope.launch { drawerState.open() }
                             }) {
-                                Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                                Icon(Icons.Rounded.Menu, contentDescription = context.getString(R.string.description_menu))
+                            }
+                        },
+                        actions = {
+                            if (firestoreSyncManager.photoUrl != "null") {
+                                AsyncImage(
+                                    model = firestoreSyncManager.photoUrl,
+                                    contentDescription = context.getString(R.string.description_profile_image),
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Rounded.AccountCircle,
+                                    contentDescription = context.getString(R.string.description_profile_image),
+                                    modifier = Modifier.size(40.dp)
+                                )
                             }
                         }
                     )
@@ -96,20 +119,21 @@ fun NavigationScreen() {
 
 @Composable
 fun DrawerContent(onDestinationClicked: (route: String) -> Unit) {
+    val context = LocalContext.current
     ModalDrawerSheet {
         Column {
-            Text(text = "Hack-Nav", modifier = Modifier.padding(16.dp))
+            Text(text = context.getString(R.string.app_name), modifier = Modifier.padding(16.dp))
             HorizontalDivider()
             NavigationDrawerItem(
-                label = { Text("Home") },
+                label = { Text(context.getString(R.string.route_home)) },
                 selected = false,
-                onClick = { onDestinationClicked("Home") },
+                onClick = { onDestinationClicked(context.getString(R.string.route_home)) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
             NavigationDrawerItem(
-                label = { Text("Marking") },
+                label = { Text(context.getString(R.string.route_marking)) },
                 selected = false,
-                onClick = { onDestinationClicked("Marking") },
+                onClick = { onDestinationClicked(context.getString(R.string.route_marking)) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
         }

@@ -128,6 +128,7 @@ class Login(private val context: Context) {
         val user = auth.currentUser
         if (user != null) {
             Toast.makeText(context, context.getString(R.string.login_successful) + ": " + user.displayName, Toast.LENGTH_SHORT).show()
+            QRCode.generateQRCode(context, user.uid, 512, 512)
         }
         else {
             throw IOException(context.getString(R.string.login_failed))

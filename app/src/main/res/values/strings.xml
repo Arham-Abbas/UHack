@@ -11,4 +11,17 @@
     <string name="invalid_token">Received an invalid google id token response</string>
     <string name="unexpected_token">Unexpected type of credential</string>
     <string name="login_successful">Signed in as</string>
+    <string name="description_menu">Menu</string>
+    <string name="route_home">Home</string>
+    <string name="route_marking">Marking</string>
+    <string name="error_qr">Error generating QR Code</string>
+    <string name="description_profile_image">Profile Image</string>
+    <string name="description_qr">QR Code</string>
+    <string name="collection_users">users</string>
+    <string name="field_type">type</string>
+    <string name="user_unauthorized">UNAUTHORIZED</string>
+    <string name="type_mentors">MENTOR</string>
+    <string name="collection_mentors">mentors</string>
+    <string name="field_assigned_teams">Assigned Teams</string>
+    <string name="action_signing_in">Signing In</string>
 </resources>

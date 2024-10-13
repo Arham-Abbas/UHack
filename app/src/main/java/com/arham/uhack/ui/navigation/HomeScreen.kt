@@ -1,5 +1,7 @@
 package com.arham.uhack.ui.navigation
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,29 +12,44 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arham.uhack.data.FirestoreSyncManager
-import com.arham.uhack.data.generateQRCode
+import com.arham.uhack.data.QRCode
 import com.google.firebase.auth.FirebaseAuth
+import com.arham.uhack.R
 
+@OptIn(ExperimentalLayoutApi::class)
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
+    val context = LocalContext.current
     var type by remember { mutableStateOf<String?>(null) } // Initialize as null
+    var assignedTeams by remember { mutableStateOf<HashMap<String, List<String>>?>(null) }
 
-    LaunchedEffect(firestoreSyncManager) {
+    LaunchedEffect(firestoreSyncManager.type) {
         firestoreSyncManager.type.collect { newType ->
             type = newType
+            firestoreSyncManager.update()
+            Log.d("HomeScreen", "New type: $newType")
         }
     }
 
-    val qrCodeBitmap = user?.let { generateQRCode(it.uid, 512, 512) }
+    // Add LaunchedEffect for assignedTeams
+    LaunchedEffect(firestoreSyncManager.assignedTeams) {
+        firestoreSyncManager.assignedTeams.collect { newAssignedTeams ->
+            assignedTeams = newAssignedTeams
+            Log.d("HomeScreen", "New assigned teams: $newAssignedTeams")
+        }
+    }
+
+    val qrCodeBitmap = QRCode.qrCodeBitmap
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +58,7 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
     ) {
         if (qrCodeBitmap != null) {
             Image(bitmap = qrCodeBitmap.asImageBitmap(),
-                contentDescription = "QR Code",
+                contentDescription = context.getString(R.string.description_qr),
                 modifier = Modifier
                     .size(256.dp)
                     .clip(RoundedCornerShape(16.dp))
@@ -50,11 +67,23 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
         Spacer(modifier = Modifier.height(16.dp)) // Add spacing
         Text(type.toString())
         if (user != null) {
-            Text("Name: ${user.displayName}")
+            Text(user.displayName.toString())
         }
-        if (type != "mentors") {
-            Text("Team ID: 12345")
-            Text("Team Name: Awesome Team")
+        if (type == context.getString(R.string.type_mentors)) {
+            assignedTeams?.forEach { (round, teams) -> // Iterate through assignedTeams
+                Text(round) // Display the round (key)
+                FlowRow( // Use FlowRow for wrapping
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp), // Spacing between items horizontally
+                    verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between rows vertically
+                ) {
+                    teams.forEach { team -> // Iterate through teams (values)
+                        Text(text = team,
+                            modifier = Modifier.padding(4.dp) // Optional: Add padding around each item
+                        ) // Display each team name
+                    }
+                }
+            }
         }
     }
 }
