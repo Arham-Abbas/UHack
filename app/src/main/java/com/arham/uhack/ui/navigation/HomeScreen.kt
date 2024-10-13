@@ -63,6 +63,7 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
                     .size(256.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
+            Log.d("HomeScreen", "QR Code drawn")
         }
         Spacer(modifier = Modifier.height(16.dp)) // Add spacing
         Text(type.toString())

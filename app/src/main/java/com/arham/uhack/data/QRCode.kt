@@ -14,10 +14,12 @@ class QRCode {
 
     companion object {
         var qrCodeBitmap: Bitmap? = null
-
+        private var result: BitMatrix? = null
+        private var width: Int? = null
         suspend fun generateQRCode(context: Context, data: String, width: Int, height: Int) {
+            this.width = width
             withContext(Dispatchers.IO) {
-                val result: BitMatrix = try {
+                result = try {
                     MultiFormatWriter().encode(data, BarcodeFormat.QR_CODE, width, height, null)
                 } catch (e: IllegalArgumentException) {
                     // Handle the error, e.g., log it or show a message
@@ -28,17 +30,25 @@ class QRCode {
                     ).show()
                     return@withContext // Return early from the function
                 }
-                val w = result.width
-                val h = result.height
-                val pixels = IntArray(w * h)
-                for (y in 0 until h) {
-                    val offset = y * w
-                    for (x in 0 until w) {
-                        pixels[offset + x] = if (result[x, y]) -0x1000000 else -0x1
-                    }
+            }
+        }
+
+        fun updateColour(foreground: Int, background: Int) {
+            val w = result?.width
+            val h = result?.height
+            val pixels = IntArray(h?.let { w?.times(it) } ?: 0 )
+            for (y in 0 until h!!) {
+                val offset = y * w!!
+                for (x in 0 until w) {
+                    pixels[offset + x] = if (result?.get(x, y) == true) foreground else background
                 }
-                qrCodeBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-                qrCodeBitmap!!.setPixels(pixels, 0, width, 0, 0, w, h)
+            }
+
+            qrCodeBitmap = w?.let { Bitmap.createBitmap(it, h, Bitmap.Config.ARGB_8888) }
+            width?.let {
+                if (w != null) {
+                    qrCodeBitmap!!.setPixels(pixels, 0, it, 0, 0, w, h)
+                }
             }
         }
     }
