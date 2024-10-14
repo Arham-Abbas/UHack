@@ -1,7 +1,6 @@
 package com.arham.uhack.data
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.arham.uhack.R
 import com.google.firebase.auth.FirebaseAuth
@@ -26,7 +25,6 @@ class FirestoreSyncManager(private val context: Context) {
     val photoUrl = user?.photoUrl.toString()
 
     init {
-        Log.d("FirestoreSyncManager", "Initialized")
         loadDocument(context.getString(R.string.collection_users),
             context.getString(R.string.field_type)
         )
@@ -38,7 +36,6 @@ class FirestoreSyncManager(private val context: Context) {
         // Load from cache first
         documentRef?.get(Source.CACHE)?.addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                Log.d("FirestoreSyncManager", "Loading Document from CACHE: $collectionId")
                 setVar(documentSnapshot, fieldId)
                 // Attach listener for real-time updates
                 attachListenerToDocument(collectionId, fieldId)
@@ -47,7 +44,6 @@ class FirestoreSyncManager(private val context: Context) {
             ?.addOnFailureListener{
                 documentRef.get(Source.SERVER).addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
-                        Log.d("FirestoreSyncManager", "Loading Document from SERVER: $collectionId")
                         setVar(documentSnapshot, fieldId)
                         // Attach listener for real-time updates
                         attachListenerToDocument(collectionId, fieldId)
@@ -60,11 +56,9 @@ class FirestoreSyncManager(private val context: Context) {
     private fun setVar(documentSnapshot: DocumentSnapshot, fieldId: String) {
         when (fieldId) {
             context.getString(R.string.field_type) -> {
-                Log.d("FirestoreSyncManager", "Updating Variable: $fieldId")
                 _type.value = documentSnapshot.getString(fieldId)
             }
             context.getString(R.string.field_assigned_teams) -> {
-                Log.d("FirestoreSyncManager", "Updating Variable: $fieldId")
                 _assignedTeams.value = documentSnapshot.get(fieldId) as? HashMap<String, List<String>>
             }
         }
@@ -80,7 +74,6 @@ class FirestoreSyncManager(private val context: Context) {
                 }
 
                 if (snapshot != null && snapshot.exists()) {
-                    Log.d("FirestoreSyncManager", "Attaching Listener to: $collectionId")
                     setVar(snapshot, fieldId)
                 }
             }

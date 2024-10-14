@@ -28,12 +28,14 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
             multiDexEnabled = true
+            isDebuggable = false
+            isJniDebuggable = false
         }
         getByName("debug") {
             isJniDebuggable = true
@@ -98,6 +100,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.integrity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

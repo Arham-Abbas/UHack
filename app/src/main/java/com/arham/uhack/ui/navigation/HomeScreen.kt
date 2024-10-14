@@ -1,7 +1,6 @@
 package com.arham.uhack.ui.navigation
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +36,6 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
         firestoreSyncManager.type.collect { newType ->
             type = newType
             firestoreSyncManager.update()
-            Log.d("HomeScreen", "New type: $newType")
         }
     }
 
@@ -45,7 +43,6 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
     LaunchedEffect(firestoreSyncManager.assignedTeams) {
         firestoreSyncManager.assignedTeams.collect { newAssignedTeams ->
             assignedTeams = newAssignedTeams
-            Log.d("HomeScreen", "New assigned teams: $newAssignedTeams")
         }
     }
 
@@ -63,7 +60,6 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
                     .size(256.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
-            Log.d("HomeScreen", "QR Code drawn")
         }
         Spacer(modifier = Modifier.height(16.dp)) // Add spacing
         Text(type.toString())

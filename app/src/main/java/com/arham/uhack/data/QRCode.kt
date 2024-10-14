@@ -3,6 +3,10 @@ package com.arham.uhack.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
+import android.graphics.Canvas
+import android.graphics.Matrix
+import androidx.core.graphics.drawable.toBitmap
 import com.arham.uhack.R
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
@@ -33,7 +37,7 @@ class QRCode {
             }
         }
 
-        fun updateColour(foreground: Int, background: Int) {
+        fun updateColour(context: Context, foreground: Int, background: Int) {
             val w = result?.width
             val h = result?.height
             val pixels = IntArray(h?.let { w?.times(it) } ?: 0 )
@@ -49,6 +53,25 @@ class QRCode {
                 if (w != null) {
                     qrCodeBitmap!!.setPixels(pixels, 0, it, 0, 0, w, h)
                 }
+            }
+
+            val appIcon = AppCompatResources.getDrawable(context, R.drawable.uhack)?.toBitmap() // Replace with your app icon resource
+            val resizedAppIcon = appIcon?.let {
+                Bitmap.createScaledBitmap(it, 128, 128, false) // Resize to 128x128
+            }
+            resizedAppIcon?.let {
+                val iconWidth = it.width
+                val iconHeight = it.height
+                val qrWidth = qrCodeBitmap!!.width
+                val qrHeight = qrCodeBitmap!!.height
+
+                val canvas = Canvas(qrCodeBitmap!!)
+                val matrix = Matrix()
+                matrix.postTranslate(
+                    (qrWidth - iconWidth) / 2f,
+                    (qrHeight - iconHeight) / 2f
+                )
+                canvas.drawBitmap(it, matrix, null)
             }
         }
     }

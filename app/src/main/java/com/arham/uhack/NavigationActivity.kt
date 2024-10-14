@@ -26,8 +26,7 @@ import com.arham.uhack.data.QRCode
 import com.arham.uhack.ui.navigation.NavigationHost
 import com.arham.uhack.ui.theme.UHackTheme
 import kotlinx.coroutines.launch
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Edit
+import com.arham.uhack.ui.navigation.DrawerContent
 
 class NavigationActivity : ComponentActivity() {
 
@@ -46,11 +45,11 @@ class NavigationActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationScreen() {
-    QRCode.updateColour(MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.surfaceVariant.toArgb())
+    val context = LocalContext.current
+    QRCode.updateColour(context, MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.surfaceVariant.toArgb())
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val context = LocalContext.current
     val firestoreSyncManager = FirestoreSyncManager(context)
     var currentView by remember { mutableStateOf(context.getString(R.string.route_home)) }
     var currentStack by remember { mutableStateOf<String?>(null) }
@@ -77,7 +76,8 @@ fun NavigationScreen() {
                     currentView = route
                     scope.launch { drawerState.close() }
                 },
-                currentView
+                currentView,
+                firestoreSyncManager
             )
         },
         content = {
@@ -127,72 +127,6 @@ fun NavigationScreen() {
             }
         }
     )
-}
-
-@Composable
-fun DrawerContent(onDestinationClicked: (route: String) -> Unit, currentRoute: String) {
-    val context = LocalContext.current
-    ModalDrawerSheet(
-        drawerContainerColor = MaterialTheme.colorScheme.surface // Set drawer background color
-    ) {
-        Column {
-            Text(text = context.getString(R.string.app_name),
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.headlineSmall, // Set app name typography
-                color = MaterialTheme.colorScheme.onSurface // Set app name color
-            )
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-            Spacer(modifier = Modifier.height(8.dp)) // Add padding after divider
-            NavigationDrawerItem(
-                icon = { Icon(Icons.Rounded.Home,
-                    contentDescription = context.getString(R.string.route_home),
-                    tint = if (currentRoute == context.getString(R.string.route_home)) {
-                        MaterialTheme.colorScheme.primary // Tint with primary color when selected
-                    } else {
-                        MaterialTheme.colorScheme.onSurface // Default tint color
-                    }
-                ) }, // Add Home icon
-                label = {
-                    Text(
-                        text = context.getString(R.string.route_home),
-                        style = MaterialTheme.typography.bodyMedium, // Set label typography
-                        color = if (currentRoute == context.getString(R.string.route_home)) {
-                            MaterialTheme.colorScheme.primary // Highlight selected item
-                        } else {
-                            MaterialTheme.colorScheme.onSurface // Default label color
-                        }
-                    )
-                },
-                selected = currentRoute == context.getString(R.string.route_home),
-                onClick = { onDestinationClicked(context.getString(R.string.route_home)) },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-            )
-            NavigationDrawerItem(
-                icon = { Icon(Icons.Rounded.Edit,
-                    contentDescription = context.getString(R.string.route_marking),
-                    tint = if (currentRoute == context.getString(R.string.route_marking)) {
-                        MaterialTheme.colorScheme.primary // Tint with primary color when selected
-                    } else {
-                        MaterialTheme.colorScheme.onSurface // Default tint color
-                    }
-                ) }, // Add Edit icon
-                label = {
-                    Text(
-                        text = context.getString(R.string.route_marking),
-                        style = MaterialTheme.typography.bodyMedium, // Set label typography
-                        color = if (currentRoute == context.getString(R.string.route_marking)) {
-                            MaterialTheme.colorScheme.primary // Highlight selected item
-                        } else {
-                            MaterialTheme.colorScheme.onSurface // Default label color
-                        }
-                    )
-                },
-                selected = currentRoute == context.getString(R.string.route_marking),
-                onClick = { onDestinationClicked(context.getString(R.string.route_marking)) },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-            )
-        }
-    }
 }
 
 @Preview(showBackground = true)
