@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.firebase.firestore.Source
+import kotlin.collections.mapValues
 
 class FirestoreSyncManager(private val context: Context) {
 
@@ -20,35 +21,52 @@ class FirestoreSyncManager(private val context: Context) {
     private val user = auth.currentUser
     private var _type = MutableStateFlow<String?>(context.getString(R.string.user_unauthorized))
     private var _assignedTeams = MutableStateFlow<HashMap<String, List<String>>?>(null)
+    private var _marks = MutableStateFlow<Map<String, Map<String, Int>>?>(null)
     val type: StateFlow<String?> = _type.asStateFlow()
     val assignedTeams: StateFlow<HashMap<String, List<String>>?> = _assignedTeams.asStateFlow()
+    val marks: StateFlow<Map<String, Map<String, Int>>?> = _marks.asStateFlow()
     val photoUrl = user?.photoUrl.toString()
 
     init {
-        loadDocument(context.getString(R.string.collection_users),
-            context.getString(R.string.field_type)
-        )
+        user?.let {
+            loadDocument(context.getString(R.string.collection_users), it.uid,
+                context.getString(R.string.field_type)
+            )
+        }
     }
 
-    private fun loadDocument(collectionId: String, fieldId: String) {
-        val documentRef = user?.let { firestore.collection(collectionId).document(it.uid) }
+    fun loadDocument(collectionId: String, documentId: String, fieldId: String) {
+        val documentRef = firestore.collection(collectionId).document(documentId)
 
         // Load from cache first
-        documentRef?.get(Source.CACHE)?.addOnSuccessListener { documentSnapshot ->
+        documentRef.get(Source.CACHE).addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 setVar(documentSnapshot, fieldId)
                 // Attach listener for real-time updates
-                attachListenerToDocument(collectionId, fieldId)
+                attachListenerToDocument(collectionId, documentId, fieldId)
             }
         }
-            ?.addOnFailureListener{
+            .addOnFailureListener{
                 documentRef.get(Source.SERVER).addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
                         setVar(documentSnapshot, fieldId)
                         // Attach listener for real-time updates
-                        attachListenerToDocument(collectionId, fieldId)
+                        attachListenerToDocument(collectionId, documentId, fieldId)
                     }
                 }
+                    .addOnFailureListener {
+                        when (fieldId) {
+                            context.getString(R.string.field_type) -> {
+                                _type.value = context.getString(R.string.user_unauthorized)
+                            }
+                            context.getString(R.string.field_assigned_teams) -> {
+                                _assignedTeams.value = null
+                            }
+                            context.getString(R.string.field_marks) -> {
+                                _marks.value = null
+                            }
+                        }
+                    }
             }
     }
 
@@ -61,12 +79,21 @@ class FirestoreSyncManager(private val context: Context) {
             context.getString(R.string.field_assigned_teams) -> {
                 _assignedTeams.value = documentSnapshot.get(fieldId) as? HashMap<String, List<String>>
             }
+            context.getString(R.string.field_marks) -> {
+                    // Safely convert Long to Int
+                val marksData = documentSnapshot.data?.mapValues { (it.value as? Long)?.toInt() ?: (it.value as? Int) ?: 0 }
+                if (marksData != null) {
+                    _marks.value = mapOf(documentSnapshot.id to marksData) // Store with documentSnapshot.id as key
+                } else {
+                    _marks.value = null // Handle case where marksData is null
+                }
+            }
         }
     }
 
-    private fun attachListenerToDocument(collectionId: String, fieldId: String) {
-        user?.let { firestore.collection(collectionId).document(it.uid) }
-            ?.addSnapshotListener { snapshot, exception ->
+    private fun attachListenerToDocument(collectionId: String, documentID: String, fieldId: String) {
+        firestore.collection(collectionId).document(documentID)
+            .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
                     // Handle errors
                     Toast.makeText(context, exception.message, Toast.LENGTH_SHORT).show()
@@ -78,11 +105,28 @@ class FirestoreSyncManager(private val context: Context) {
                 }
             }
     }
+
+    fun saveDocument(collectionId: String, documentId: String, data: MutableMap<String, Any>) {
+        val documentRef = firestore.collection(collectionId).document(documentId)
+
+        documentRef.set(data)
+            .addOnSuccessListener {
+                // Document saved successfully
+                Toast.makeText(context, context.getString(R.string.save_successful), Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors
+                Toast.makeText(context, context.getString(R.string.save_error) + exception.message, Toast.LENGTH_SHORT).show()
+            }
+    }
+
     fun update() {
         if (_type.value == context.getString(R.string.type_mentors)) {
-            loadDocument(context.getString(R.string.collection_mentors),
-                context.getString(R.string.field_assigned_teams)
-            )
+            user?.let {
+                loadDocument(context.getString(R.string.collection_mentors), it.uid,
+                    context.getString(R.string.field_assigned_teams)
+                )
+            }
         }
     }
 }

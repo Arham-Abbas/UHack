@@ -51,5 +51,6 @@ fun NavigationHost(
                 )
             }
         }
+        composable(context.getString(R.string.route_about)) { AboutScreen() }
     }
 }

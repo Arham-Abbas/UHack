@@ -23,4 +23,22 @@
     <string name="collection_mentors">mentors</string>
     <string name="field_assigned_teams">Assigned Teams</string>
     <string name="action_signing_in">Signing In</string>
+    <string name="key_round1">Round 1</string>
+    <string name="key_round2">Round 2</string>
+    <string name="key_round3">Round 3</string>
+    <string name="save_successful">Document saved successfully</string>
+    <string name="save_error">"Error Saving Document: "</string>
+    <string name="description_collapse">Collapse</string>
+    <string name="description_expand">Expand</string>
+    <string name="category_technicality">Technicality</string>
+    <string name="category_innovation">Innovation</string>
+    <string name="category_scalability">Scalability</string>
+    <string name="category_design">Design</string>
+    <string name="category_sustainability">Sustainability</string>
+    <string name="field_total">Total</string>
+    <string name="collection_marking">marking</string>
+    <string name="button_submit">Submit</string>
+    <string name="field_marks">marks</string>
+    <string name="event_name">UHack 3.0</string>
+    <string name="route_about">About Us</string>
 </resources>

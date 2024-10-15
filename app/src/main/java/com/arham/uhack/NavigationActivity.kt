@@ -46,7 +46,7 @@ class NavigationActivity : ComponentActivity() {
 @Composable
 fun NavigationScreen() {
     val context = LocalContext.current
-    QRCode.updateColour(context, MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.surfaceVariant.toArgb())
+    QRCode.updateColour(context, MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.surface.toArgb())
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
@@ -98,7 +98,8 @@ fun NavigationScreen() {
                                     model = firestoreSyncManager.photoUrl,
                                     contentDescription = context.getString(R.string.description_profile_image),
                                     modifier = Modifier
-                                        .size(40.dp)
+                                        .size(48.dp)
+                                        .padding(8.dp)
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
@@ -106,7 +107,10 @@ fun NavigationScreen() {
                                 Icon(
                                     imageVector = Icons.Rounded.AccountCircle,
                                     contentDescription = context.getString(R.string.description_profile_image),
-                                    modifier = Modifier.size(40.dp)
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .padding(8.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         },

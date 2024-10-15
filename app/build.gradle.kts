@@ -19,7 +19,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        signingConfig = signingConfigs.getByName("debug")
         multiDexEnabled = true
         testFunctionalTest = true
         testHandleProfiling = true
