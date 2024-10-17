@@ -27,6 +27,7 @@ fun MarkingScreen(firestoreSyncManager: FirestoreSyncManager) {
     var expandedRound by remember { mutableStateOf<String?>(null) } // State to store expanded round
     var expandedTeam by remember { mutableStateOf<String?>(null) } // State to store expanded team
 
+
     LaunchedEffect(firestoreSyncManager.assignedTeams) {
         firestoreSyncManager.assignedTeams.collect { newAssignedTeams ->
             assignedTeams = newAssignedTeams

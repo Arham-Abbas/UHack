@@ -80,14 +80,14 @@ fun AboutScreen() {
                     modifier = Modifier
                         .background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(16.dp)
                         ) // Rounded corners, light background
                         .padding(8.dp)
                         .clickable { uriHandler.openUri(context.getString(R.string.link_united)) }
                 ) {
                     LinkWithIcon(
                         icon = Icons.Rounded.Language,
-                        text = context.getString(R.string.link_united),
+                        text = context.getString(R.string.description_website),
                         onClick = { uriHandler.openUri(context.getString(R.string.link_united)) }
                     )
                 }
@@ -142,14 +142,14 @@ fun AboutScreen() {
                     modifier = Modifier
                         .background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(16.dp)
                         ) // Rounded corners, light background
                         .padding(8.dp)
                         .clickable { uriHandler.openUri(context.getString(R.string.link_technovators)) }
                 ) {
                     LinkWithIcon(
                         icon = Icons.Rounded.Language,
-                        text = context.getString(R.string.link_technovators),
+                        text = context.getString(R.string.description_website),
                         onClick = { uriHandler.openUri(context.getString(R.string.link_technovators)) }
                     )
                 }
@@ -204,14 +204,14 @@ fun AboutScreen() {
                     modifier = Modifier
                         .background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(16.dp)
                         ) // Rounded corners, light background
                         .padding(8.dp)
                         .clickable { uriHandler.openUri(context.getString(R.string.link_uhack)) }
                 ) {
                     LinkWithIcon(
                         icon = Icons.Rounded.Language,
-                        text = context.getString(R.string.link_uhack),
+                        text = context.getString(R.string.description_website),
                         onClick = { uriHandler.openUri(context.getString(R.string.link_uhack)) }
                     )
                 }

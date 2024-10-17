@@ -59,7 +59,13 @@
     <string name="label_feedback">Your Feedback</string>
     <string name="error_email">Could not find a suitable app.</string>
     <string name="subject_feedback">UHack feedback</string>
-    <string name="email_developer">mailto:abbasrizvisayedarham6@gmail.com</string>
+    <string name="email_developer">abbasrizvisayedarham6@gmail.com</string>
     <string name="route_feedback">Feedback</string>
     <string name="title_email">Send Email</string>
+    <string name="button_logout">Logout</string>
+    <string name="website_privacy_policy">https://united.ac.in/uhack/privacy.html</string>
+    <string name="website_terms_of_service">Terms of Service</string>
+    <string name="description_close">Close</string>
+    <string name="description_privacy_policy">Privacy Policy</string>
+    <string name="description_terms_of_service">Terms of Service</string>
 </resources>

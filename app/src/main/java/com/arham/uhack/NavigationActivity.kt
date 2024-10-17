@@ -11,6 +11,8 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
@@ -27,6 +29,7 @@ import com.arham.uhack.ui.navigation.NavigationHost
 import com.arham.uhack.ui.theme.UHackTheme
 import kotlinx.coroutines.launch
 import com.arham.uhack.ui.navigation.DrawerContent
+import com.arham.uhack.ui.navigation.ProfileOverlay
 
 class NavigationActivity : ComponentActivity() {
 
@@ -53,6 +56,7 @@ fun NavigationScreen() {
     val firestoreSyncManager = FirestoreSyncManager(context)
     var currentView by remember { mutableStateOf(context.getString(R.string.route_home)) }
     var currentStack by remember { mutableStateOf<String?>(null) }
+    var showOverlay by remember { mutableStateOf(false) }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -93,25 +97,26 @@ fun NavigationScreen() {
                             }
                         },
                         actions = {
-                            if (firestoreSyncManager.photoUrl != "null") {
-                                AsyncImage(
-                                    model = firestoreSyncManager.photoUrl,
-                                    contentDescription = context.getString(R.string.description_profile_image),
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .padding(8.dp)
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Rounded.AccountCircle,
-                                    contentDescription = context.getString(R.string.description_profile_image),
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .padding(8.dp),
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
+                            // Profile Picture Button
+                            IconButton(onClick = { showOverlay = !showOverlay }) {
+                                if (firestoreSyncManager.photoUrl != "null") {
+                                    AsyncImage(
+                                        model = firestoreSyncManager.photoUrl,
+                                        contentDescription = context.getString(R.string.description_profile_image),
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountCircle,
+                                        contentDescription = context.getString(R.string.description_profile_image),
+                                        modifier = Modifier
+                                            .size(48.dp),
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         },
                         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -129,6 +134,9 @@ fun NavigationScreen() {
                     firestoreSyncManager = firestoreSyncManager
                 )
             }
+
+            // Overlay Screen
+            ProfileOverlay(showOverlay = showOverlay, onDismiss = { showOverlay = false })
         }
     )
 }

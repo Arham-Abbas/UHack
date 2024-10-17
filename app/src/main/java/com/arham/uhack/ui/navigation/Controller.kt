@@ -43,7 +43,10 @@ fun NavigationHost(
         startDestination = context.getString(R.string.route_home),
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(context.getString(R.string.route_home)) { HomeScreen(firestoreSyncManager) }
+        composable(context.getString(R.string.route_home)) {
+            HomeScreen(
+                firestoreSyncManager = firestoreSyncManager)
+        }
         if (showMarkingScreen) {
             composable(context.getString(R.string.route_marking)) {
                 MarkingScreen(
