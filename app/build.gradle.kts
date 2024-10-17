@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.com.google.gms.google.services.gradle.plugin)
+    alias(libs.plugins.com.google.firebase.crashlytics)
 }
 
 android {
@@ -80,7 +81,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -100,6 +101,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.integrity)
+    implementation(libs.firebase.crashlytics.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

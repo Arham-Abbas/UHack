@@ -30,12 +30,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.arham.uhack.data.Result
 import kotlinx.coroutines.launch
 import com.arham.uhack.ui.theme.Typography
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
         FirebaseApp.initializeApp(this)
         val user = FirebaseAuth.getInstance().currentUser
 

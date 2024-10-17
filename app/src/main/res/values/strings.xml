@@ -41,4 +41,25 @@
     <string name="field_marks">marks</string>
     <string name="event_name">UHack 3.0</string>
     <string name="route_about">About Us</string>
+    <string name="description_website">Official Website</string>
+    <string name="heading_united">United Group of Institutions</string>
+    <string name="tag_url">URL</string>
+    <string name="link_united">https://united.ac.in</string>
+    <string name="about_united">Vision:\nTo nurture the talent and deliver the competent and skilled resources ready to face the challenges of a global industry.\n\nWhy United:\n1. Ranked among top Engineering and Management colleges in the state.\n2. Excellent Placement records that lead Unitians land more than one reputed job.\n3. Magnificent infrastructure with a palatial central library\n4. Lavishly made sport complex with gym.\n5. Various student clubs and activity centers to enhance the skills and talent of the students\n6. Dedicated Corporate Relations Centres and job portals to ensure the placement of even a mediocre student.\n7. In-house training team to get the students prepared for different campus drives.\n8. Personality development programs and technical workshops to ensure overall skill development.\n9. Exposure to international universities and industrial visits.\n10. 2000+ placements every year in various MNCs including high package offers by Infosys, TCS, Wipro, Accenture, Capgemini, Nucleus Software, Amazon, Intel, Wallmart global tech etc.</string>
+    <string name="heading_technovators">Technovators Society</string>
+    <string name="link_technovators">https://technovator.in</string>
+    <string name="about_technovators">Technovators Society is a vibrant community dedicated to organizing high-impact technical events such as hackathons, lecture series, conferences, guest talks, and workshops. Our mission is to nurture innovation and technical expertise among members and the broader community. We strive to promote collaboration, knowledge exchange, and problem-solving among tech enthusiasts, while bridging the gap between students and industry professionals.\n\nThrough our flagship Uhack series and other initiatives, we offer a platform for learning, innovation, and professional growth, empowering individuals to shape the future of technology. Our dynamic community is committed to fostering a culture of excellence and creativity.</string>
+    <string name="link_uhack">https://united.ac.in/uhack</string>
+    <string name="about_uhack">UHACK 3.0 is an annual hackathon event that brings together innovative minds from various disciplines to create cutting-edge solutions. This 24-hour coding extravaganza provides a platform for participants to showcase their coding skills, creativity, and teamwork. With a focus on emerging technologies, UHACK 3.0 encourages students, professionals, and innovative minds to develop cutting-edge solutions that address real-world problems.</string>
+    <string name="description_developer">Developer</string>
+    <string name="heading_developer">Lead Developer</string>
+    <string name="name_developer">Arham Abbas</string>
+    <string name="description_feedback">This app is still in development. Expect a few rough edges. We value your feedback! Please share your thoughts and suggestions to help us improve the app.</string>
+    <string name="button_feedback">Submit Feedback</string>
+    <string name="label_feedback">Your Feedback</string>
+    <string name="error_email">Could not find a suitable app.</string>
+    <string name="subject_feedback">UHack feedback</string>
+    <string name="email_developer">mailto:abbasrizvisayedarham6@gmail.com</string>
+    <string name="route_feedback">Feedback</string>
+    <string name="title_email">Send Email</string>
 </resources>

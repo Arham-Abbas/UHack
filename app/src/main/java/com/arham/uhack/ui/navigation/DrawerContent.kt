@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Feedback
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -132,6 +133,33 @@ fun DrawerContent(onDestinationClicked: (route: String) -> Unit, currentRoute: S
                 },
                 selected = currentRoute == context.getString(R.string.route_about),
                 onClick = { onDestinationClicked(context.getString(R.string.route_about)) },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+            )
+            NavigationDrawerItem(
+                icon = {
+                    Icon(
+                        Icons.Rounded.Feedback,
+                        contentDescription = context.getString(R.string.route_feedback),
+                        tint = if (currentRoute == context.getString(R.string.route_feedback)) {
+                            MaterialTheme.colorScheme.primary // Tint with primary color when selected
+                        } else {
+                            MaterialTheme.colorScheme.onSurface // Default tint color
+                        }
+                    )
+                }, // Add About icon
+                label = {
+                    Text(
+                        text = context.getString(R.string.route_feedback),
+                        style = MaterialTheme.typography.bodyMedium, // Set label typography
+                        color = if (currentRoute == context.getString(R.string.route_feedback)) {
+                            MaterialTheme.colorScheme.primary // Highlight selected item
+                        } else {
+                            MaterialTheme.colorScheme.onSurface // Default label color
+                        }
+                    )
+                },
+                selected = currentRoute == context.getString(R.string.route_feedback),
+                onClick = { onDestinationClicked(context.getString(R.string.route_feedback)) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
         }
