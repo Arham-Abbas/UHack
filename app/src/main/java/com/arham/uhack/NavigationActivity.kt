@@ -75,6 +75,7 @@ fun NavigationScreen() {
                         navController.navigate(route) {popUpTo(currentStack!!) {
                             inclusive = true } // Pop to current stack start
                             currentStack = route // Update current stack start
+                            launchSingleTop = true
                         }
                     }
                     currentView = route

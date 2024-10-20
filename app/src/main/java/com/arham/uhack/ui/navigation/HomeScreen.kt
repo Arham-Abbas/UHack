@@ -110,15 +110,17 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
 
         Spacer(modifier = Modifier.height(16.dp)) // Added spacing between boxes
 
-        Text(
-            text = context.getString(R.string.field_assigned_teams), // Assuming you have an assigned_teams string resource
-            style = MaterialTheme.typography.headlineSmall, // Prominent font style
-            color = MaterialTheme.colorScheme.onSurface, // Prominent color
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 8.dp), // Added padding
-            textAlign = TextAlign.Center // Center align
-        )
+        if (type == context.getString(R.string.type_mentors)) {
+            Text(
+                text = context.getString(R.string.field_assigned_teams), // Assuming you have an assigned_teams string resource
+                style = MaterialTheme.typography.headlineSmall, // Prominent font style
+                color = MaterialTheme.colorScheme.onSurface, // Prominent color
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp), // Added padding
+                textAlign = TextAlign.Center // Center align
+            )
+        }
         // Display assigned teams in the order: Round 1, Round 2, Round 3
         val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
         rounds.forEach { round ->

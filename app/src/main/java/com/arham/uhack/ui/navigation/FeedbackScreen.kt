@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,11 +39,13 @@ import com.arham.uhack.R
 fun FeedbackScreen() {
     val context = LocalContext.current
     var feedbackText by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
@@ -115,7 +119,7 @@ fun FeedbackScreen() {
         Button(
             onClick = {
                 val selectorIntent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:") // Only email apps should handle this
+                    data = Uri.parse(context.getString(R.string.link_mail)) // Only email apps should handle this
                 }
                 val emailIntent = Intent(Intent.ACTION_SEND).apply {
                     putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.email_developer)))
@@ -123,6 +127,8 @@ fun FeedbackScreen() {
                     putExtra(Intent.EXTRA_TEXT, feedbackText)
                     selector = selectorIntent // Set the selector intent
                 }
+
+                emailIntent.type = context.getString(R.string.type_mime)
 
                 // Check if there is an email app available to handle the intent
                 if (emailIntent.resolveActivity(context.packageManager) != null) {

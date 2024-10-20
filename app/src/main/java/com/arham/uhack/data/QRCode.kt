@@ -38,40 +38,46 @@ class QRCode {
         }
 
         fun updateColour(context: Context, foreground: Int, background: Int) {
-            val w = result?.width
-            val h = result?.height
-            val pixels = IntArray(h?.let { w?.times(it) } ?: 0 )
-            for (y in 0 until h!!) {
-                val offset = y * w!!
-                for (x in 0 until w) {
-                    pixels[offset + x] = if (result?.get(x, y) == true) foreground else background
+            try {
+                val w = result?.width
+                val h = result?.height
+                val pixels = IntArray(h?.let { w?.times(it) } ?: 0)
+                for (y in 0 until h!!) {
+                    val offset = y * w!!
+                    for (x in 0 until w) {
+                        pixels[offset + x] =
+                            if (result?.get(x, y) == true) foreground else background
+                    }
                 }
-            }
 
-            qrCodeBitmap = w?.let { Bitmap.createBitmap(it, h, Bitmap.Config.ARGB_8888) }
-            width?.let {
-                if (w != null) {
-                    qrCodeBitmap!!.setPixels(pixels, 0, it, 0, 0, w, h)
+                qrCodeBitmap = w?.let { Bitmap.createBitmap(it, h, Bitmap.Config.ARGB_8888) }
+                width?.let {
+                    if (w != null) {
+                        qrCodeBitmap!!.setPixels(pixels, 0, it, 0, 0, w, h)
+                    }
                 }
-            }
 
-            val appIcon = AppCompatResources.getDrawable(context, R.drawable.uhack)?.toBitmap() // Replace with your app icon resource
-            val resizedAppIcon = appIcon?.let {
-                Bitmap.createScaledBitmap(it, 128, 128, false) // Resize to 128x128
-            }
-            resizedAppIcon?.let {
-                val iconWidth = it.width
-                val iconHeight = it.height
-                val qrWidth = qrCodeBitmap!!.width
-                val qrHeight = qrCodeBitmap!!.height
+                val appIcon = AppCompatResources.getDrawable(context, R.drawable.uhack)
+                    ?.toBitmap() // Replace with your app icon resource
+                val resizedAppIcon = appIcon?.let {
+                    Bitmap.createScaledBitmap(it, 128, 128, false) // Resize to 128x128
+                }
+                resizedAppIcon?.let {
+                    val iconWidth = it.width
+                    val iconHeight = it.height
+                    val qrWidth = qrCodeBitmap!!.width
+                    val qrHeight = qrCodeBitmap!!.height
 
-                val canvas = Canvas(qrCodeBitmap!!)
-                val matrix = Matrix()
-                matrix.postTranslate(
-                    (qrWidth - iconWidth) / 2f,
-                    (qrHeight - iconHeight) / 2f
-                )
-                canvas.drawBitmap(it, matrix, null)
+                    val canvas = Canvas(qrCodeBitmap!!)
+                    val matrix = Matrix()
+                    matrix.postTranslate(
+                        (qrWidth - iconWidth) / 2f,
+                        (qrHeight - iconHeight) / 2f
+                    )
+                    canvas.drawBitmap(it, matrix, null)
+                }
+            } catch ( e: NullPointerException ) {
+                updateColour(context, foreground, background)
             }
         }
     }

@@ -13,8 +13,8 @@ android {
         applicationId = "com.arham.uhack"
         minSdk = 33
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -67,7 +67,7 @@ android {
         includeInBundle = false
     }
     buildToolsVersion = "35.0.0"
-    ndkVersion = "28.0.12433566"
+    ndkVersion = "28.0.12433566 rc1"
 }
 
 dependencies {
@@ -102,6 +102,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.integrity)
     implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
