@@ -71,4 +71,6 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="type_mime">message/rfc822</string>
     <string name="link_mail">mailto:</string>
+    <string name="route_leaderboard">Leaderboard</string>
+    <string name="type_admin">ADMIN</string>
 </resources>

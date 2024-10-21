@@ -108,6 +108,35 @@ fun DrawerContent(onDestinationClicked: (route: String) -> Unit, currentRoute: S
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
+            if (type == context.getString(R.string.type_admin)) {
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            Icons.Rounded.Edit,
+                            contentDescription = context.getString(R.string.route_leaderboard),
+                            tint = if (currentRoute == context.getString(R.string.route_leaderboard)) {
+                                MaterialTheme.colorScheme.primary // Tint with primary color when selected
+                            } else {
+                                MaterialTheme.colorScheme.onSurface // Default tint color
+                            }
+                        )
+                    }, // Add Edit icon
+                    label = {
+                        Text(
+                            text = context.getString(R.string.route_leaderboard),
+                            style = MaterialTheme.typography.bodyMedium, // Set label typography
+                            color = if (currentRoute == context.getString(R.string.route_leaderboard)) {
+                                MaterialTheme.colorScheme.primary // Highlight selected item
+                            } else {
+                                MaterialTheme.colorScheme.onSurface // Default label color
+                            }
+                        )
+                    },
+                    selected = currentRoute == context.getString(R.string.route_leaderboard),
+                    onClick = { onDestinationClicked(context.getString(R.string.route_leaderboard)) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+            }
             NavigationDrawerItem(
                 icon = {
                     Icon(

@@ -6,6 +6,7 @@ import com.arham.uhack.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +71,27 @@ class FirestoreSyncManager(private val context: Context) {
             }
     }
 
+    fun loadCollection(collectionId: String) {
+        val collection = firestore.collection(collectionId)
+        collection
+            .get(Source.CACHE)
+            .addOnSuccessListener { querySnapshot ->
+                setVar(querySnapshot)
+                attachListenerToCollection(collectionId)
+            }
+            .addOnFailureListener {
+                collection
+                    .get(Source.SERVER)
+                    .addOnSuccessListener { querySnapshot ->
+                        setVar(querySnapshot)
+                        attachListenerToCollection(collectionId)
+                    }
+                    .addOnFailureListener {
+                        _marks.value = null
+                    }
+            }
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun setVar(documentSnapshot: DocumentSnapshot, fieldId: String) {
         when (fieldId) {
@@ -89,10 +111,22 @@ class FirestoreSyncManager(private val context: Context) {
                     val convertedMarksData = marksData.mapValues { (_, value) ->
                             (value as? Long)?.toInt() ?: (value as? Int) ?: 0
                     }
-                    _marks.value = mapOf(documentSnapshot.id to mapOf(fieldId to convertedMarksData))
-                } else {
-                    _marks.value = null
+                    // Append to existing data
+                    _marks.value = (_marks.value ?: emptyMap()).toMutableMap().apply {
+                        this[documentSnapshot.id] = (this[documentSnapshot.id] ?: emptyMap()).toMutableMap().apply {
+                            this[fieldId] = convertedMarksData
+                        }
+                    }
                 }
+            }
+        }
+    }
+
+    private fun setVar(querySnapshot: QuerySnapshot) {
+        for (documentSnapshot in querySnapshot.documents) {
+            val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
+            for (round in rounds) {
+                setVar(documentSnapshot, round)
             }
         }
     }
@@ -108,6 +142,22 @@ class FirestoreSyncManager(private val context: Context) {
 
                 if (snapshot != null && snapshot.exists()) {
                     setVar(snapshot, fieldId)
+                }
+            }
+    }
+
+    private fun attachListenerToCollection(collectionId: String) {
+        firestore.collection(collectionId)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    // Handle errors
+                    Toast.makeText(context, exception.message, Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    // Update _marks.value with the new data from the snapshot
+                    setVar(snapshot)
                 }
             }
     }
