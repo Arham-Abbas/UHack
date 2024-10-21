@@ -95,7 +95,8 @@ fun MarkingScreen(firestoreSyncManager: FirestoreSyncManager) {
                             onExpand = {
                                 expandedTeam = if (expandedTeam == team) null else team // Update expandedTeam state
                             },
-                            roundColor = MaterialTheme.colorScheme.primaryContainer // Pass round color to TeamItem
+                            roundColor = MaterialTheme.colorScheme.primaryContainer, // Pass round color to TeamItem
+                            round = round
                         )
                     }
                 }

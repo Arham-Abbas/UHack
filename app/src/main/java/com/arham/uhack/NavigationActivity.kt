@@ -57,6 +57,7 @@ fun NavigationScreen() {
     var currentView by remember { mutableStateOf(context.getString(R.string.route_home)) }
     var currentStack by remember { mutableStateOf<String?>(null) }
     var showOverlay by remember { mutableStateOf(false) }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -70,10 +71,11 @@ fun NavigationScreen() {
                                 inclusive = true
                             }
                         }
-                    }
-                    else {
-                        navController.navigate(route) {popUpTo(currentStack!!) {
-                            inclusive = true } // Pop to current stack start
+                    } else {
+                        navController.navigate(route) {
+                            popUpTo(currentStack!!) {
+                                inclusive = true
+                            } // Pop to current stack start
                             currentStack = route // Update current stack start
                             launchSingleTop = true
                         }

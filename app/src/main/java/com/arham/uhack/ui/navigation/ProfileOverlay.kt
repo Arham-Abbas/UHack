@@ -48,6 +48,8 @@ import com.arham.uhack.R
 import com.google.firebase.auth.FirebaseAuth
 import com.arham.uhack.LoginActivity
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 
 @Composable
 fun ProfileOverlay(showOverlay: Boolean, onDismiss: () -> Unit) {
@@ -57,7 +59,9 @@ fun ProfileOverlay(showOverlay: Boolean, onDismiss: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val activity = (LocalContext.current as ComponentActivity)
-    
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     if (showOverlay) {
         Box(
             modifier = Modifier
@@ -71,8 +75,8 @@ fun ProfileOverlay(showOverlay: Boolean, onDismiss: () -> Unit) {
                     .align(Alignment.TopEnd)
                     .wrapContentSize() // Allow the card to wrap its content
                     .padding(
-                        horizontal = 32.dp,
-                        vertical = 128.dp
+                        horizontal = if (isLandscape) 256.dp else 16.dp,
+                        vertical = if (isLandscape) 64.dp else 128.dp
                     ), // Added padding to the external card
                 shape = RoundedCornerShape(16.dp), // Add rounded corners to the external card
                 colors = CardDefaults.cardColors(

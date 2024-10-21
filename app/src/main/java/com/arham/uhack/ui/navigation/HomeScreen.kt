@@ -120,36 +120,36 @@ fun HomeScreen(firestoreSyncManager: FirestoreSyncManager) {
                     .padding(top = 16.dp, bottom = 8.dp), // Added padding
                 textAlign = TextAlign.Center // Center align
             )
-        }
-        // Display assigned teams in the order: Round 1, Round 2, Round 3
-        val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
-        rounds.forEach { round ->
-            assignedTeams?.get(round)?.let { teams ->
-                Text(
-                    text = round,
-                    style = MaterialTheme.typography.titleMedium, // More prominent font style
-                    color = MaterialTheme.colorScheme.onSurface, // More prominent color
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp), // Added bottom padding
-                    textAlign = TextAlign.Center // Center align the round label
-                )
-                teams.forEach { team ->
-                    Card(
+            // Display assigned teams in the order: Round 1, Round 2, Round 3
+            val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
+            rounds.forEach { round ->
+                assignedTeams?.get(round)?.let { teams ->
+                    Text(
+                        text = round,
+                        style = MaterialTheme.typography.titleMedium, // More prominent font style
+                        color = MaterialTheme.colorScheme.onSurface, // More prominent color
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp, horizontal = 16.dp), // Increased padding
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Text(
-                            text = team,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            .padding(8.dp), // Added bottom padding
+                        textAlign = TextAlign.Center // Center align the round label
+                    )
+                    teams.forEach { team ->
+                        Card(
                             modifier = Modifier
-                                .padding(16.dp) // Added padding inside the team card
-                        )
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp, horizontal = 16.dp), // Increased padding
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(
+                                text = team,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier
+                                    .padding(16.dp) // Added padding inside the team card
+                            )
+                        }
                     }
                 }
             }

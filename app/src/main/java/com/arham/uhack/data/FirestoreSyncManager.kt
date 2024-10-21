@@ -21,10 +21,10 @@ class FirestoreSyncManager(private val context: Context) {
     private val user = auth.currentUser
     private var _type = MutableStateFlow<String?>(context.getString(R.string.user_unauthorized))
     private var _assignedTeams = MutableStateFlow<HashMap<String, List<String>>?>(null)
-    private var _marks = MutableStateFlow<Map<String, Map<String, Int>>?>(null)
+    private var _marks = MutableStateFlow<Map<String, Map<String, Map<String, Int>>>?>(null)
     val type: StateFlow<String?> = _type.asStateFlow()
     val assignedTeams: StateFlow<HashMap<String, List<String>>?> = _assignedTeams.asStateFlow()
-    val marks: StateFlow<Map<String, Map<String, Int>>?> = _marks.asStateFlow()
+    val marks: StateFlow<Map<String, Map<String, Map<String, Int>>>?> = _marks.asStateFlow()
     val photoUrl = user?.photoUrl.toString()
 
     init {
@@ -79,13 +79,19 @@ class FirestoreSyncManager(private val context: Context) {
             context.getString(R.string.field_assigned_teams) -> {
                 _assignedTeams.value = documentSnapshot.get(fieldId) as? HashMap<String, List<String>>
             }
-            context.getString(R.string.field_marks) -> {
+            context.getString(R.string.key_round1),
+            context.getString(R.string.key_round2),
+            context.getString(R.string.key_round3) -> {
                     // Safely convert Long to Int
-                val marksData = documentSnapshot.data?.mapValues { (it.value as? Long)?.toInt() ?: (it.value as? Int) ?: 0 }
+                val marksData = documentSnapshot.get(fieldId) as? Map<String, Any>
                 if (marksData != null) {
-                    _marks.value = mapOf(documentSnapshot.id to marksData) // Store with documentSnapshot.id as key
+                    // Convert nested map values to Int (if necessary)
+                    val convertedMarksData = marksData.mapValues { (_, value) ->
+                            (value as? Long)?.toInt() ?: (value as? Int) ?: 0
+                    }
+                    _marks.value = mapOf(documentSnapshot.id to mapOf(fieldId to convertedMarksData))
                 } else {
-                    _marks.value = null // Handle case where marksData is null
+                    _marks.value = null
                 }
             }
         }

@@ -43,7 +43,8 @@ fun TeamItem(
     firestoreSyncManager: FirestoreSyncManager,
     isExpanded: Boolean, // Add isExpanded parameter
     onExpand: () -> Unit, // Add onExpand lambda
-    roundColor: Color
+    roundColor: Color,
+    round: String
 ) {
     val context = LocalContext.current
     val categories = listOf(
@@ -63,7 +64,7 @@ fun TeamItem(
     LaunchedEffect(key1 = firestoreSyncManager.marks) {
         firestoreSyncManager.marks.collect { newMarks ->
             marks = if (newMarks != null) {
-                newMarks[team]
+                newMarks[team]?.get(round)
             } // Get marks for the current team
             else {
                 null
@@ -116,7 +117,7 @@ fun TeamItem(
             firestoreSyncManager.loadDocument(
                 context.getString(R.string.collection_marking),
                 team,
-                context.getString(R.string.field_marks)
+                round
             )
             categories.forEach { category ->
                 Column {
@@ -167,10 +168,14 @@ fun TeamItem(
                     dataToSend[context.getString(R.string.field_total)] =
                         totalMarks // Add total field
 
+                    // Create a nested map to store marks for the round
+                    val roundMarks = mutableMapOf<String, Any>()
+                    roundMarks[round] = dataToSend
+
                     firestoreSyncManager.saveDocument(
                         context.getString(R.string.collection_marking),
                         team,
-                        dataToSend
+                        roundMarks
                     )
                 },
                 enabled = isAllSelected && !isSubmitted, // Enable only if all selected and not submitted

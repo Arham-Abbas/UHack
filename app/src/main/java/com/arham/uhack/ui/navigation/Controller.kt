@@ -38,6 +38,12 @@ fun NavigationHost(
         derivedStateOf { type == context.getString(R.string.type_mentors) }
     }
 
+    LaunchedEffect(showMarkingScreen) {
+        if (!showMarkingScreen) {
+            navController.navigate(context.getString(R.string.route_home))
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = context.getString(R.string.route_home),
@@ -45,14 +51,13 @@ fun NavigationHost(
     ) {
         composable(context.getString(R.string.route_home)) {
             HomeScreen(
-                firestoreSyncManager = firestoreSyncManager)
+                firestoreSyncManager = firestoreSyncManager
+            )
         }
-        if (showMarkingScreen) {
-            composable(context.getString(R.string.route_marking)) {
-                MarkingScreen(
-                    firestoreSyncManager
-                )
-            }
+        composable(context.getString(R.string.route_marking)) {
+            MarkingScreen(
+                firestoreSyncManager
+            )
         }
         composable(context.getString(R.string.route_about)) { AboutScreen() }
         composable(context.getString(R.string.route_feedback)) { FeedbackScreen() }
