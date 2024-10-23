@@ -73,4 +73,5 @@
     <string name="link_mail">mailto:</string>
     <string name="route_leaderboard">Leaderboard</string>
     <string name="type_admin">ADMIN</string>
+    <string name="type_jury">JURY</string>
 </resources>

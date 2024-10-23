@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.firebase.firestore.Source
 import kotlin.collections.mapValues
+import com.google.firebase.firestore.SetOptions
 
 class FirestoreSyncManager(private val context: Context) {
 
@@ -23,9 +24,11 @@ class FirestoreSyncManager(private val context: Context) {
     private var _type = MutableStateFlow<String?>(context.getString(R.string.user_unauthorized))
     private var _assignedTeams = MutableStateFlow<HashMap<String, List<String>>?>(null)
     private var _marks = MutableStateFlow<Map<String, Map<String, Map<String, Int>>>?>(null)
+    private var _mentors = MutableStateFlow<Map<String, Map<String, List<String>>>?>(null)
     val type: StateFlow<String?> = _type.asStateFlow()
     val assignedTeams: StateFlow<HashMap<String, List<String>>?> = _assignedTeams.asStateFlow()
     val marks: StateFlow<Map<String, Map<String, Map<String, Int>>>?> = _marks.asStateFlow()
+    val mentors: StateFlow<Map<String, Map<String, List<String>>>?> = _mentors.asStateFlow()
     val photoUrl = user?.photoUrl.toString()
 
     init {
@@ -76,17 +79,18 @@ class FirestoreSyncManager(private val context: Context) {
         collection
             .get(Source.CACHE)
             .addOnSuccessListener { querySnapshot ->
-                setVar(querySnapshot)
+                setVar(querySnapshot, collectionId)
                 attachListenerToCollection(collectionId)
             }
             .addOnFailureListener {
                 collection
                     .get(Source.SERVER)
                     .addOnSuccessListener { querySnapshot ->
-                        setVar(querySnapshot)
+                        setVar(querySnapshot, collectionId)
                         attachListenerToCollection(collectionId)
                     }
                     .addOnFailureListener {
+                        _assignedTeams.value = null
                         _marks.value = null
                     }
             }
@@ -119,14 +123,29 @@ class FirestoreSyncManager(private val context: Context) {
                     }
                 }
             }
+            context.getString(R.string.collection_mentors) -> {
+                val mentorsData = documentSnapshot.get(context.getString(R.string.field_assigned_teams)) as? HashMap<String, List<String>>
+                if (mentorsData != null) {
+                    _mentors.value = (_mentors.value ?: emptyMap()).toMutableMap().apply {
+                        this[documentSnapshot.id] = mentorsData
+                    }
+                }
+            }
         }
     }
 
-    private fun setVar(querySnapshot: QuerySnapshot) {
+    private fun setVar(querySnapshot: QuerySnapshot, collectionId: String) {
         for (documentSnapshot in querySnapshot.documents) {
-            val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
-            for (round in rounds) {
-                setVar(documentSnapshot, round)
+            when (collectionId) {
+                context.getString(R.string.collection_marking) -> {
+                    val rounds = listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3))
+                    for (round in rounds) {
+                        setVar(documentSnapshot, round)
+                    }
+                }
+                context.getString(R.string.collection_mentors) -> {
+                    setVar(documentSnapshot, context.getString(R.string.collection_mentors))
+                }
             }
         }
     }
@@ -157,7 +176,7 @@ class FirestoreSyncManager(private val context: Context) {
 
                 if (snapshot != null) {
                     // Update _marks.value with the new data from the snapshot
-                    setVar(snapshot)
+                    setVar(snapshot, collectionId)
                 }
             }
     }
@@ -165,7 +184,7 @@ class FirestoreSyncManager(private val context: Context) {
     fun saveDocument(collectionId: String, documentId: String, data: MutableMap<String, Any>) {
         val documentRef = firestore.collection(collectionId).document(documentId)
 
-        documentRef.set(data)
+        documentRef.set(data, SetOptions.merge())
             .addOnSuccessListener {
                 // Document saved successfully
                 Toast.makeText(context, context.getString(R.string.save_successful), Toast.LENGTH_SHORT).show()

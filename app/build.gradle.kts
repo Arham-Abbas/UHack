@@ -11,10 +11,10 @@ android {
 
     defaultConfig {
         applicationId = "com.arham.uhack"
-        minSdk = 33
+        minSdk = 31
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 4
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

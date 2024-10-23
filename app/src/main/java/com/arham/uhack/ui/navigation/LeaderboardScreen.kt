@@ -1,5 +1,8 @@
 package com.arham.uhack.ui.navigation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -30,7 +33,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.arham.uhack.data.Normalizer
+import kotlinx.coroutines.launch
 
 @Composable
 fun LeaderboardScreen(firestoreSyncManager: FirestoreSyncManager) {
@@ -112,27 +122,80 @@ fun CategoryView(firestoreSyncManager: FirestoreSyncManager, category: String) {
     // You can access firestoreSyncManager.marks here to get the data
     // and display it using LazyColumn or other
     val context = LocalContext.current
+    val normalizer = Normalizer()
     var marks by remember { mutableStateOf<Map<String, Map<String, Map<String, Int>>>?>(null) }
+    var mentors by remember { mutableStateOf<Map<String, Map<String, List<String>>>?>(null) }
+    var normalizedMarks by remember {
+        mutableStateOf<Map<String, Map<String, Map<String, Double>>>?>(
+            null
+        )
+    }
 
-    LaunchedEffect(key1 = firestoreSyncManager.marks) {
-        firestoreSyncManager.marks.collect { newMarks ->
-            marks = newMarks
+    LaunchedEffect(key1 = firestoreSyncManager.marks, key2 = firestoreSyncManager.mentors) {
+        launch {
+            firestoreSyncManager.marks.collect { newMarks ->
+                marks = newMarks
+                if (mentors != null) {
+                    normalizedMarks = normalizer.normalize(marks!!, mentors!!)
+                }
+            }
+        }
+        launch {
+            firestoreSyncManager.mentors.collect { newMentors ->
+                mentors = newMentors
+                if (marks != null) {
+                    normalizedMarks = normalizer.normalize(marks!!, mentors!!)
+                }
+            }
         }
     }
 
     firestoreSyncManager.loadCollection(context.getString(R.string.collection_marking))
+    firestoreSyncManager.loadCollection(context.getString(R.string.collection_mentors))
 
     LazyColumn(modifier = Modifier.padding(16.dp)) {
-        val sortedMarks = marks?.entries?.sortedByDescending { (_, rounds) ->
-            rounds.values.firstOrNull()?.get(category) ?: 0 // Sort by category score, defaulting to 0 if null
+        val sortedMarks = normalizedMarks?.entries?.sortedByDescending { (_, rounds) ->
+            val totalScore = rounds.filterKeys { it in listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3)) }
+                .values
+                .sumOf { it[category] ?: 0.0 } // Sum scores for specified rounds and category
+            totalScore
         }
 
-        sortedMarks?.forEach { (teamId, rounds) ->
+        sortedMarks?.forEach { (teamId, _) ->
+            // Display Team ID and total score for the specified category
+            val totalScore = normalizedMarks?.get(teamId)
+                ?.filterKeys { it in listOf(context.getString(R.string.key_round1), context.getString(R.string.key_round2), context.getString(R.string.key_round3)) }
+                ?.values
+                ?.sumOf { it[category] ?: 0.0 }
+
             item {
-                // Display Team ID and Marks for the specified category
-                val categoryScore = rounds.values.firstOrNull()?.get(category) // Get category score
-                if (categoryScore != null) {
-                    Text("$teamId: $categoryScore", modifier = Modifier.padding(bottom = 8.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = teamId,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = totalScore?.toString() ?: "-", // Handle null totalScore
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
